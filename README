@@ -1,0 +1,2 @@
+dhcpmod STREAMS kernel module for filtering DHCP traffic
+Copyright 2011 Serghei Samsi <sscdvp@gmail.com>

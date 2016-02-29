@@ -1,0 +1,7 @@
+1. ./compile
+2. For 32-bit kernel:
+    cp ./strmod/dhcpmod /usr/kernel/strmod/
+   For 64-bit kernel:
+   cp ./strmod/amd64/dhcpmod /usr/kernel/strmod/amd64/
+3. Patch your ISC DHCP installation for using dhcpmod (dhcp-4.3.2-dhcpv4_streams_filter.patch)
+

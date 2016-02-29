@@ -1,0 +1,45 @@
+#!/bin/sh
+
+CCOMPILER="/usr/sfw/bin/gcc"
+LINKER="/usr/ccs/bin/ld"
+
+arch_version=`/usr/bin/isainfo -b`
+arch_type=`/usr/bin/isainfo -k`
+arch_str=""
+
+echo "Compiling 32-bit..."
+
+rm -f hash.o kstat.o queue.o bootp.o dhcp_hook_filter_main.o dhcp_strmod_filter_main.o
+$CCOMPILER -g -Wall -D_KERNEL -m32 -c hash.c
+$CCOMPILER -g -Wall -D_KERNEL -m32 -c kstat.c
+$CCOMPILER -g -Wall -D_KERNEL -m32 -c queue.c
+$CCOMPILER -g -Wall -D_KERNEL -m32 -c bootp.c
+
+arch32_str="strmod/"
+
+$CCOMPILER -g -Wall -D_KERNEL -m32 -c dhcp_strmod_filter_main.c
+$LINKER -dy -r hash.o kstat.o queue.o bootp.o dhcp_strmod_filter_main.o -o ${arch32_str}dhcpmod
+chmod 755 ${arch32_str}dhcpmod
+chown root:sys ${arch32_str}dhcpmod
+
+if [ ${arch_version} -eq "32" ]; then
+    exit 0;
+fi
+
+echo "Compiling 64-bit..."
+
+rm -f hash.o kstat.o queue.o bootp.o dhcp_hook_filter_main.o dhcp_strmod_filter_main.o
+$CCOMPILER -g -Wall -mcmodel=medium -D_KERNEL -m${arch_version} -c hash.c
+$CCOMPILER -g -Wall -mcmodel=medium -D_KERNEL -m${arch_version} -c kstat.c
+$CCOMPILER -g -Wall -mcmodel=medium -D_KERNEL -m${arch_version} -c queue.c
+$CCOMPILER -g -Wall -mcmodel=medium -D_KERNEL -m${arch_version} -c bootp.c
+
+if [ ${arch_version} -eq "64" ]; then
+    arch_str="strmod/${arch_type}/"
+fi
+
+$CCOMPILER -g -Wall -mcmodel=medium -D_KERNEL -m${arch_version} -c dhcp_strmod_filter_main.c
+$LINKER -dy -r hash.o kstat.o queue.o bootp.o dhcp_strmod_filter_main.o -o ${arch_str}dhcpmod
+chmod 755 ${arch_str}dhcpmod
+chown root:sys ${arch_str}dhcpmod
+
